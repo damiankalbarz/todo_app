@@ -28,6 +28,15 @@ class RemoveTodo extends TodoEvent {
   List<Object?> get props => [todo];
 }
 
+class EditTodo extends TodoEvent {
+  final Todo newTodo;
+
+  EditTodo(this.newTodo);
+
+  @override
+  List<Object> get props => [newTodo];
+}
+
 class AlterTodo extends TodoEvent {
   final int index;
 

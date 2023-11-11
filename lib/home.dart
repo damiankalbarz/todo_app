@@ -26,9 +26,94 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  editTodo(Todo todo){
+    context.read<TodoBloc>().add(
+      EditTodo(todo),
+    );
+  }
+
   alertTodo(int index) {
     context.read<TodoBloc>().add(
         AlterTodo(index)
+    );
+  }
+
+  void _showEditDialog(Todo todo) {
+    TextEditingController titleController = TextEditingController(text: todo.title);
+    TextEditingController subtitleController = TextEditingController(text: todo.subtitle);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Task'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                cursorColor: Theme.of(context).colorScheme.secondary,
+                decoration: InputDecoration(
+                  hintText: 'Task Title...',
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: subtitleController,
+                cursorColor: Theme.of(context).colorScheme.secondary,
+                decoration: InputDecoration(
+                  hintText: 'Task Description...',
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Zapisz zmiany do bloc-a
+                Todo editedTodo = Todo(
+                  title: titleController.text,
+                  subtitle: subtitleController.text,
+                  isDone: todo.isDone,
+                );
+                editTodo(editedTodo);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -174,6 +259,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                   foregroundColor: Colors.white,
                                   icon: Icons.delete,
                                   label: 'Delete',
+                                ),
+                              ],
+                            ),
+                            endActionPane: ActionPane(
+                              motion: const ScrollMotion(),
+                              children: [
+                                SlidableAction(
+                                  onPressed: (_) {
+                                    _showEditDialog(state.todos[i]);
+                                  },
+                                  backgroundColor: const Color(0xFF4CAF50),
+                                  foregroundColor: Colors.white,
+                                  icon: Icons.edit,
+                                  label: 'Edit',
                                 ),
                               ],
                             ),
