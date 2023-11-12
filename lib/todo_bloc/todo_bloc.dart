@@ -8,12 +8,23 @@ part 'todo_event.dart';
 part 'todo_state.dart';
 
 class TodoBloc extends HydratedBloc<TodoEvent, TodoState> {
-  TodoBloc() : super(const TodoState()) {
+  TodoBloc() : super(TodoState()) {
     on<TodoStarted>(_onStarted);
     on<AddTodo>(_onAddTodo);
     on<EditTodo>(_onEditTodo);
     on<RemoveTodo>(_onRemoveTodo);
     on<AlterTodo>(_onAlterTodo);
+    on<SearchTodo>(_onSearchTodo);
+  }
+
+  void _onSearchTodo(SearchTodo event, Emitter<TodoState> emit,){
+    emit(state.copyWith(status: TodoStatus.loading));
+    try {
+      final List<Todo> searchResult = state.todos.where((todo) => todo.title.contains(event.query)).toList();
+      emit(state.copyWith(searchResults: searchResult, status: TodoStatus.success));
+    } catch (e) {
+      emit(state.copyWith(status: TodoStatus.error));
+    }
   }
 
   void _onStarted(

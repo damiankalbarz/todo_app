@@ -28,6 +28,15 @@ class RemoveTodo extends TodoEvent {
   List<Object?> get props => [todo];
 }
 
+class SearchTodo extends TodoEvent {
+  final String query;
+
+  const SearchTodo(this.query);
+
+  @override
+  List<Object?> get props => [query];
+}
+
 class EditTodo extends TodoEvent {
   final Todo newTodo;
 
@@ -36,6 +45,8 @@ class EditTodo extends TodoEvent {
   @override
   List<Object> get props => [newTodo];
 }
+
+
 
 class AlterTodo extends TodoEvent {
   final int index;

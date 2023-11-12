@@ -13,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  TextEditingController searchController = TextEditingController();
 
   addTodo(Todo todo) {
     context.read<TodoBloc>().add(
@@ -136,6 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+
                         TextField(
                           controller: controller1,
                           cursorColor: Theme.of(context).colorScheme.secondary,
@@ -237,8 +239,20 @@ class _HomeScreenState extends State<HomeScreen> {
           child: BlocBuilder<TodoBloc, TodoState>(
             builder: (context, state) {
               if(state.status == TodoStatus.success) {
-                return ListView.builder(
-                    itemCount: state.todos.length,
+                return Column( children: [
+                  TextField(
+                    controller: searchController,
+                    onChanged: (query) {
+                      // Wysyłanie zapytania o wyszukiwanie do TodoBloc
+                      context.read<TodoBloc>().add(SearchTodo(query));
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Search',
+                    ),
+                  ),
+                  Expanded(child:
+                  ListView.builder(
+                    itemCount: state.searchResults.length,
                     itemBuilder: (context, int i) {
                       return Card(
                         color: Theme.of(context).colorScheme.primary,
@@ -253,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 SlidableAction(
                                   onPressed: (_) {
-                                    removeTodo(state.todos[i]);
+                                    removeTodo(state.searchResults[i]);
                                   },
                                   backgroundColor: const Color(0xFFFE4A49),
                                   foregroundColor: Colors.white,
@@ -278,13 +292,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             child: ListTile(
                                 title: Text(
-                                    state.todos[i].title
+                                    state.searchResults[i].title
                                 ),
                                 subtitle: Text(
-                                    state.todos[i].subtitle
+                                    state.searchResults[i].subtitle
                                 ),
                                 trailing: Checkbox(
-                                    value: state.todos[i].isDone,
+                                    value: state.searchResults[i].isDone,
                                     activeColor: Theme.of(context).colorScheme.secondary,
                                     onChanged: (value) {
                                       alertTodo(i);
@@ -294,7 +308,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       );
                     }
-                );
+                  ),
+                ),],);
               } else if (state.status == TodoStatus.initial){
                 return const Center(child: CircularProgressIndicator());
               } else {
